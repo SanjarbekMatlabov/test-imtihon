@@ -1,0 +1,33 @@
+{
+  "name": "YHQ Imtihon — B toifa",
+  "short_name": "YHQ Imtihon",
+  "description": "O'zbekiston haydovchilik guvohnomasi nazariy imtihoniga tayyorgarlik. 1260 savol, 63 bilet, uch tilda. Internetsiz ishlaydi.",
+  "lang": "uz",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0e1116",
+  "theme_color": "#0e1116",
+  "categories": ["education"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Imtihon boshlash",
+      "short_name": "Imtihon",
+      "url": "./?mode=exam",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Xatolarim",
+      "short_name": "Xatolar",
+      "url": "./?mode=mistakes",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

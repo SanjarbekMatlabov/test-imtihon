@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>YHQ Imtihon — B toifa</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0e1116">
+<meta name="description" content="O'zbekiston B toifa haydovchilik imtihoniga tayyorgarlik — 1260 savol, 63 bilet, uch tilda, internetsiz ishlaydi.">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="YHQ Imtihon">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23f5a524'/><text x='16' y='23' font-size='19' font-weight='bold' text-anchor='middle' fill='%231a1205'>Y</text></svg>">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand" onclick="App.home()">
+      <i>Y</i><span>YHQ Imtihon<b style="color:var(--accent)"> · B</b></span>
+    </div>
+    <div class="spacer"></div>
+    <div class="seg" id="langSeg">
+      <button data-lang="l" class="on">Lotin</button>
+      <button data-lang="c">Кирилл</button>
+      <button data-lang="r">Рус</button>
+    </div>
+    <button class="chip" id="themeBtn" title="Mavzu">Yorug‘</button>
+  </header>
+
+  <main id="view"></main>
+
+</div>
+
+<div id="modal" class="modal" onclick="if(event.target===this)App.askNo()"></div>
+
+<script src="data/questions.js"></script>
+<script src="data/topics.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/pwa.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
