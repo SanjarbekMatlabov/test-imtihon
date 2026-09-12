@@ -122,6 +122,31 @@ holga keltiradi.
 Tekshirildi: 1440x860, 1366x768 va 1280x720 da eng uzun savollarda ham
 (683 belgi matn, 1463 belgi izoh bilan) sahifa aylanmadi va variantlar kesilmadi.
 
+## Progress va davom ettirish
+
+Biletlar va mavzular **to'xtagan joydan** ochiladi, avval to'g'ri yechilgan savollar
+esa yashil holatda tiklanadi — to'g'ri variant ko'rinib turadi, izohi ochiq, qayta
+javob berilmaydi.
+
+- `S.solved` — to'g'ri yechilgan savollar (butun ilova bo'yicha)
+- `S.pos` — bilet va mavzuda to'xtagan joy (`t7`, `pbelgi` ko'rinishida)
+
+Joy har bir savolga o'tganda saqlanadi. Saqlangan joy bo'lmasa, birinchi yechilmagan
+savoldan boshlanadi.
+
+Progress uch joyda ko'rinadi:
+
+| Qayerda | Ko'rinishi |
+|---|---|
+| Bilet tugmasi | raqam atrofidagi halqa — yashil 100%, amber qisman |
+| Mavzu kartochkasi | ikonka atrofidagi halqa |
+| Mashq paneli | chiziq va «5 / 20» yozuvi |
+
+**Boshidan** tugmasi (mashq panelida) shu bilet yoki mavzudagi yechilgan belgilarni
+olib tashlaydi va nolga qaytaradi. Progressni o'chirgani uchun tasdiq so'raydi.
+
+Imtihon rejimlarida progress ko'rsatilmaydi — u yerda maqsad boshqa.
+
 ## Tillar
 
 Til tugmasi **butun interfeysni** almashtiradi, faqat savol matnini emas: sarlavhalar,

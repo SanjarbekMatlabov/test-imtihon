@@ -24,10 +24,11 @@ function load() {
       if (!s.solved) s.solved = {};      // eski saqlangan holat bilan moslik
       if (!s.mistakes) s.mistakes = {};
       if (!s.tickets) s.tickets = {};
+      if (!s.pos) s.pos = {};            // bilet/mavzuda to'xtagan joy
       return s;
     }
   } catch (e) {}
-  return { lang: 'l', theme: 'dark', exams: 0, passed: 0, mistakes: {}, tickets: {}, marathon: 0, solved: {} };
+  return { lang: 'l', theme: 'dark', exams: 0, passed: 0, mistakes: {}, tickets: {}, marathon: 0, solved: {}, pos: {} };
 }
 function save() {
   try { localStorage.setItem(SKEY, JSON.stringify(S)); } catch (e) {}
@@ -53,11 +54,20 @@ function byTicket(n) {
 function byTopic(id) {
   return Q.filter(function (q) { return QTOPIC[q.id] === id; });
 }
-/* mavzu bo'yicha o'zlashtirish: to'g'ri yechilgan / jami */
-function topicProgress(id) {
-  var list = byTopic(id), done = 0;
+/* ro'yxat bo'yicha o'zlashtirish: to'g'ri yechilgan / jami */
+function progressOf(list) {
+  var done = 0;
   for (var i = 0; i < list.length; i++) if (S.solved[list[i].id]) done++;
   return { total: list.length, done: done, pct: list.length ? Math.round(done / list.length * 100) : 0 };
+}
+function topicProgress(id)  { return progressOf(byTopic(id)); }
+function ticketProgress(n)  { return progressOf(byTicket(n)); }
+
+/* to'xtagan joyni saqlash kaliti */
+function posKey(mode, opts) {
+  if (mode === 'ticket') return 't' + opts.ticket;
+  if (mode === 'topic')  return 'p' + opts.topic;
+  return '';
 }
 function mm(sec) {
   var m = Math.floor(sec / 60), s = sec % 60;
@@ -135,13 +145,40 @@ function start(mode, opts) {
   if (!list || !list.length) return home();
 
   var timed = (mode === 'exam' || mode === 'mixed');
+  var ans = new Array(list.length).fill(-1);
+  var idx = 0;
+
+  // bilet va mavzuda: avval yechilgan savollar yashil holda tiklanadi,
+  // "Boshidan" bosilgan bo'lsa (opts.fresh) toza boshlanadi
+  var key = posKey(mode, opts);
+  if (key && !opts.fresh) {
+    for (var pi = 0; pi < list.length; pi++) {
+      if (S.solved[list[pi].id]) {
+        for (var oi = 0; oi < list[pi].a.length; oi++) {
+          if (list[pi].a[oi].ok) { ans[pi] = oi; break; }
+        }
+      }
+    }
+    // saqlangan joy, bo'lmasa birinchi yechilmagan savol
+    var saved = S.pos[key];
+    if (saved != null && saved >= 0 && saved < list.length) idx = saved;
+    else {
+      var first = ans.indexOf(-1);
+      idx = first >= 0 ? first : 0;
+    }
+  } else if (key && opts.fresh) {
+    delete S.pos[key]; save();
+  } else if (mode === 'marathon' && S.marathon < list.length) {
+    idx = S.marathon;
+  }
+
   ses = {
     mode: mode,
     ticket: opts.ticket || 0,
     topic: opts.topic || '',
     list: list,
-    idx: (mode === 'marathon' && S.marathon < list.length) ? S.marathon : 0,
-    ans: new Array(list.length).fill(-1),
+    idx: idx,
+    ans: ans,
     instant: !timed,
     timed: timed,
     left: EXAM_SECONDS,
@@ -213,7 +250,30 @@ function go(i) {
   if (!ses || i < 0 || i >= ses.list.length) return;
   ses.idx = i;
   if (ses.mode === 'marathon') { S.marathon = i; save(); }
+  else {
+    var k = posKey(ses.mode, { ticket: ses.ticket, topic: ses.topic });
+    if (k) { S.pos[k] = i; save(); }      // to'xtagan joy eslab qolinadi
+  }
   renderExam();
+}
+/* bilet yoki mavzuni boshidan boshlash — shu ro'yxatdagi progress tozalanadi */
+function restart() {
+  if (!ses) return;
+  var m = ses.mode, tk = ses.ticket, tp = ses.topic, list = ses.list;
+  var p = progressOf(list);
+  if (!p.done) return start(m, { ticket: tk, topic: tp, fresh: true });
+
+  ask({
+    icon: 'warn',
+    title: T('restartTitle'),
+    text: '<span class="warn-txt">' + esc(T('restartWarn', { n: p.done })) + '</span>',
+    yes: T('yesRestart'),
+    onYes: function () {
+      for (var i = 0; i < list.length; i++) delete S.solved[list[i].id];
+      save();
+      start(m, { ticket: tk, topic: tp, fresh: true });
+    }
+  });
 }
 function next() {
   if (!ses) return;
@@ -247,12 +307,24 @@ function renderExam() {
             : ses.mode === 'topic' ? topicName(ses.topic)
             : T('titleMistakes');
 
+  // o'rgatuvchi rejimlarda: nechta savol yechilgani va boshidan boshlash tugmasi
+  var trainer = (ses.mode === 'ticket' || ses.mode === 'topic');
+  var prog = '';
+  if (trainer) {
+    var p = progressOf(ses.list);
+    prog = '<div class="bar-prog" title="' + esc(T('solvedOf', { a: p.done, b: p.total })) + '">' +
+             '<div class="bar-prog-line"><i style="width:' + p.pct + '%"></i></div>' +
+             '<span>' + p.done + ' / ' + p.total + '</span>' +
+           '</div>';
+  }
+
   var bar =
     '<div class="bar">' +
       (ses.timed ? '<div class="timer" id="timer">' + mm(ses.left) + '</div>' : '') +
       '<div class="counter"><b>' + (ses.idx + 1) + '</b> / ' + ses.list.length + '</div>' +
-      lives +
+      lives + prog +
       '<div class="spacer"></div>' +
+      (trainer ? '<button class="chip" onclick="App.restart()">' + esc(T('restart')) + '</button>' : '') +
       '<button class="chip" onclick="App.quit()">' + esc(T('quit')) + '</button>' +
     '</div>';
 
@@ -434,12 +506,24 @@ function home() {
   var rate = S.exams ? Math.round(S.passed / S.exams * 100) : 0;
 
   var tk = '';
+  var TC = 2 * Math.PI * 17;                       // bilet halqasining aylanasi
   for (var i = 1; i <= 63; i++) {
-    var best = S.tickets[i];
-    var col = best == null ? '' : (best >= 18 ? 'var(--ok)' : best >= 10 ? 'var(--accent)' : 'var(--bad)');
-    tk += '<button class="tk" onclick="App.start(\'ticket\',{ticket:' + i + '})" title="' +
-          esc(best == null ? T('tkNone') : T('tkBest', { n: best })) + '">' + i +
-          (col ? '<span class="dot" style="background:' + col + '"></span>' : '') + '</button>';
+    var tp = ticketProgress(i);
+    var tcol = tp.pct >= 100 ? 'var(--ok-solid)' : tp.pct > 0 ? 'var(--accent)' : 'transparent';
+    var tip = T('tkSolved', { a: tp.done, b: tp.total });
+    if (S.tickets[i] != null) tip += ' · ' + T('tkBest', { n: S.tickets[i] });
+    tk += '<button class="tk' + (tp.pct >= 100 ? ' full' : '') + '" ' +
+            'onclick="App.start(\'ticket\',{ticket:' + i + '})" title="' + esc(tip) + '">' +
+            '<span class="tk-ring">' +
+              '<svg width="42" height="42" viewBox="0 0 42 42">' +
+                '<circle cx="21" cy="21" r="17" fill="none" stroke="var(--line)" stroke-width="3"></circle>' +
+                '<circle cx="21" cy="21" r="17" fill="none" stroke="' + tcol + '" stroke-width="3" ' +
+                  'stroke-linecap="round" stroke-dasharray="' + TC + '" ' +
+                  'stroke-dashoffset="' + (TC - TC * tp.pct / 100) + '" transform="rotate(-90 21 21)"></circle>' +
+              '</svg>' +
+              '<b>' + i + '</b>' +
+            '</span>' +
+          '</button>';
   }
 
   view().innerHTML =
@@ -551,7 +635,7 @@ document.addEventListener('keydown', function (e) {
 /* ---------------- ishga tushirish ---------------- */
 window.App = {
   start: start, answer: answer, go: go, next: next, home: home, quit: quit,
-  randomExam: randomExam, askYes: askOk, askNo: askNo
+  randomExam: randomExam, askYes: askOk, askNo: askNo, restart: restart
 };
 
 document.addEventListener('DOMContentLoaded', function () {

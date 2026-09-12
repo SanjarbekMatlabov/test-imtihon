@@ -49,9 +49,16 @@ img{max-width:100%;display:block}
 .mode .badge{position:absolute;top:14px;right:14px;background:var(--accent);color:#1a1205;font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;letter-spacing:.5px}
 
 .tickets{display:grid;grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:8px;margin-top:16px}
-.tk{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 0;text-align:center;font-weight:700;font-size:15px;transition:.14s;position:relative}
-.tk:hover{border-color:var(--accent);color:var(--accent)}
-.tk .dot{position:absolute;top:6px;right:6px;width:6px;height:6px;border-radius:50%}
+.tk{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 0;
+  display:grid;place-items:center;transition:.14s}
+.tk:hover{border-color:var(--accent)}
+.tk:hover b{color:var(--accent)}
+/* raqam atrofidagi halqa — bilet necha foiz yechilgani */
+.tk-ring{position:relative;width:42px;height:42px;display:grid;place-items:center}
+.tk-ring svg{position:absolute;inset:0}
+.tk-ring b{font-size:15px;font-weight:700;line-height:1}
+.tk.full{border-color:var(--ok-solid)}
+.tk.full b{color:var(--ok-solid)}
 /* oflayn / o'rnatish kartochkasi */
 .pwa{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin-top:26px}
 .pwa-head{display:flex;gap:12px;align-items:flex-start}
@@ -88,6 +95,12 @@ img{max-width:100%;display:block}
 @keyframes pulse{50%{opacity:.45}}
 .counter{font-size:14px;color:var(--muted);font-weight:600}
 .counter b{color:var(--txt);font-size:17px}
+/* o'rgatuvchi rejimdagi progress chizig'i */
+.bar-prog{display:flex;align-items:center;gap:9px;min-width:130px}
+.bar-prog-line{flex:1;height:6px;border-radius:4px;background:var(--surface2);overflow:hidden;min-width:60px}
+.bar-prog-line i{display:block;height:100%;background:var(--ok-solid);border-radius:4px;transition:width .3s}
+.bar-prog span{font-size:12.5px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+
 .lives{display:flex;gap:5px;align-items:center}
 .life{width:11px;height:11px;border-radius:50%;background:var(--ok)}
 .life.lost{background:var(--bad);opacity:.35}

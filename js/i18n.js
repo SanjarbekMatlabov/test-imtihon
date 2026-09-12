@@ -47,6 +47,14 @@ var STR = {
                     r: 'Обучающий режим — пояснение сразу после ответа, без таймера.' },
   tkNone:         { l: 'topshirilmagan', c: 'топширилмаган', r: 'не сдан' },
   tkBest:         { l: 'eng yaxshi: {n}/20', c: 'энг яхши: {n}/20', r: 'лучший: {n}/20' },
+  tkSolved:       { l: '{a}/{b} savol yechilgan', c: '{a}/{b} савол ечилган', r: 'решено {a}/{b} вопросов' },
+  solvedOf:       { l: '{a} / {b} savol yechilgan', c: '{a} / {b} савол ечилган', r: 'решено {a} / {b} вопросов' },
+  restart:        { l: 'Boshidan', c: 'Бошидан', r: 'Сначала' },
+  restartTitle:   { l: 'Boshidan boshlansinmi?', c: 'Бошидан бошлансинми?', r: 'Начать сначала?' },
+  restartWarn:    { l: 'Yechilgan {n} ta savol belgisi olib tashlanadi va progress nolga tushadi.',
+                    c: 'Ечилган {n} та савол белгиси олиб ташланади ва прогресс нолга тушади.',
+                    r: 'Отметки с {n} решённых вопросов будут сняты, прогресс обнулится.' },
+  yesRestart:     { l: 'Ha, boshidan', c: 'Ҳа, бошидан', r: 'Да, сначала' },
 
   /* ---------- imtihon ekrani ---------- */
   quit:           { l: 'Chiqish', c: 'Чиқиш', r: 'Выйти' },
