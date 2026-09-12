@@ -1,0 +1,8 @@
+# server.js faqat lokal ishlatish uchun.
+# Uni deployga qo'shsak, Vercel loyihani Node server deb o'ylab,
+# statik fayllar o'rniga o'sha faylni ishga tushiradi va hamma narsa 404 bo'ladi.
+server.js
+ISHGA TUSHIRISH.bat
+
+# ishlab chiqish vositalari — saytda kerak emas
+tools/
