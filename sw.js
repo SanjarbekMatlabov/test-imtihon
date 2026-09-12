@@ -3,9 +3,12 @@
    Rasmlar 63 MB bo'lgani uchun avtomatik yuklanmaydi — foydalanuvchi o'zi
    "oflayn uchun yuklab olish" tugmasini bosganda yoki ko'rgan sari keshlanadi. */
 
-const VERSION = 'v1';
+/* Ilova yangilanganda VERSION ni oshiring — qobiq qayta yuklanadi.
+   IMG ataylab versiyasiz: rasmlar yangilanishdan keyin ham saqlanib qoladi,
+   aks holda har safar 63 MB qaytadan yuklanardi. */
+const VERSION = 'v2';
 const SHELL = 'yhq-shell-' + VERSION;
-const IMG = 'yhq-img-' + VERSION;
+const IMG = 'yhq-img';
 
 /* Ilova ishlashi uchun zarur fayllar (~3.5 MB) */
 const SHELL_FILES = [
@@ -14,6 +17,7 @@ const SHELL_FILES = [
   './manifest.json',
   './css/style.css',
   './js/icons.js',
+  './js/i18n.js',
   './js/pwa.js',
   './js/app.js',
   './data/questions.js',

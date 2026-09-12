@@ -70,16 +70,16 @@ function inner() {
   var full = imgTotal && imgCached >= imgTotal;
   var noSW = !('serviceWorker' in navigator) || !sw;
 
+  var T = function (k, p) { return window.I18N ? I18N.t(k, p) : k; };
+
   var head =
     '<div class="pwa-head">' +
       '<span class="pwa-ic">' + Ico.svg(full ? 'check' : online ? 'phone' : 'offline', 20) + '</span>' +
-      '<div><b>Oflayn rejim</b>' +
-        '<small>' + (noSW
-            ? 'Ishlashi uchun sayt HTTPS orqali ochilishi kerak'
-            : full
-              ? 'Barcha rasmlar yuklangan — internetsiz to‘liq ishlaydi'
-              : online ? 'Rasmlarni oldindan yuklab qo‘ysangiz internetsiz ishlaydi'
-                       : 'Internet yo‘q — yuklangan qismi ishlayapti') +
+      '<div><b>' + T('pwaTitle') + '</b>' +
+        '<small>' + (noSW ? T('pwaNeedHttps')
+              : full   ? T('pwaFull')
+              : online ? T('pwaReady')
+                       : T('pwaOffline')) +
         '</small>' +
       '</div>' +
     '</div>';
@@ -88,19 +88,19 @@ function inner() {
 
   var bar =
     '<div class="pwa-bar"><i style="width:' + pct + '%"></i></div>' +
-    '<div class="pwa-meta">' + imgCached + ' / ' + imgTotal + ' rasm · ' + pct + '%' +
-      (busy ? ' · yuklanmoqda…' : '') + '</div>';
+    '<div class="pwa-meta">' + T('pwaImages', { a: imgCached, b: imgTotal, p: pct }) +
+      (busy ? ' · ' + T('pwaLoading') : '') + '</div>';
 
   var acts = '<div class="pwa-acts">';
   if (installEvent) {
-    acts += '<button class="btn" onclick="PWA.install()">' + Ico.svg('phone', 17) + 'Ilova sifatida o‘rnatish</button>';
+    acts += '<button class="btn" onclick="PWA.install()">' + Ico.svg('phone', 17) + T('pwaInstall') + '</button>';
   }
   if (!full) {
     acts += '<button class="btn' + (installEvent ? ' ghost' : '') + '" onclick="PWA.download()"' +
             (busy || !navigator.onLine ? ' disabled' : '') + '>' +
-            Ico.svg('download', 17) + (busy ? 'Yuklanmoqda…' : 'Rasmlarni yuklab olish (~63 MB)') + '</button>';
+            Ico.svg('download', 17) + (busy ? T('pwaDownloading') : T('pwaDownload')) + '</button>';
   } else {
-    acts += '<button class="btn ghost" onclick="PWA.clear()">Keshni tozalash</button>';
+    acts += '<button class="btn ghost" onclick="PWA.clear()">' + T('pwaClear') + '</button>';
   }
   acts += '</div>';
 

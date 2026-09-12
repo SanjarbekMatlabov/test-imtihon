@@ -122,6 +122,23 @@ holga keltiradi.
 Tekshirildi: 1440x860, 1366x768 va 1280x720 da eng uzun savollarda ham
 (683 belgi matn, 1463 belgi izoh bilan) sahifa aylanmadi va variantlar kesilmadi.
 
+## Tillar
+
+Til tugmasi **butun interfeysni** almashtiradi, faqat savol matnini emas: sarlavhalar,
+rejim kartochkalari, tugmalar, tasdiqlash oynalari, natija ekrani, mavzu nomlari va
+oflayn kartochkasi — hammasi.
+
+- `js/i18n.js` — interfeys matnlari (79 ta kalit × 3 til)
+- mavzu nomlari `tools/classify.js` dagi `TOPICS` da, uch tilda
+- savol, variant va izoh `data/questions.js` da, uch tilda
+
+Yangi matn qo'shish: `js/i18n.js` ga `kalit: { l: '...', c: '...', r: '...' }` yozasiz,
+so'ng koddan `T('kalit')` deb chaqirasiz. O'rniga qo'yiladigan qiymat kerak bo'lsa
+`{n}` ko'rinishida yozib, `T('kalit', { n: 5 })` deb uzatasiz.
+
+Tanlangan til `localStorage` da saqlanadi. Imtihon o'rtasida tilni almashtirsangiz
+sessiya buzilmaydi — savol raqami, taymer va berilgan javoblar joyida qoladi.
+
 ## Ikonkalar
 
 Butun interfeysda emoji ishlatilmaydi. `js/icons.js` da 28 ta SVG ikonka bor —

@@ -12,27 +12,28 @@ const all = JSON.parse(fs.readFileSync(SRC, 'utf8'));
 
 /* --- mavzular: id, nom, ikonka --- */
 const TOPICS = [
-  /* icon — js/icons.js dagi chizma nomi (emoji emas) */
-  { id: 'belgi',    name: 'Yo‘l belgilari',            icon: 'belgi' },
-  { id: 'chiziq',   name: 'Yo‘l chiziqlari',           icon: 'chiziq' },
-  { id: 'svetofor', name: 'Svetofor va regulirovchi',  icon: 'svetofor' },
-  { id: 'chorraha', name: 'Chorrahalardan o‘tish',     icon: 'chorraha' },
-  { id: 'ustunlik', name: 'Ustunlik va yo‘l berish',   icon: 'ustunlik' },
-  { id: 'manevr',   name: 'Manevr va burilish',        icon: 'manevr' },
-  { id: 'quvib',    name: 'Quvib o‘tish',              icon: 'quvib' },
-  { id: 'tezlik',   name: 'Tezlik va masofa',          icon: 'tezlik' },
-  { id: 'toxtash',  name: 'To‘xtash va turish',        icon: 'toxtash' },
-  { id: 'piyoda',   name: 'Piyoda va yo‘lovchilar',    icon: 'piyoda' },
-  { id: 'temiryol', name: 'Temir yo‘l kesishmalari',   icon: 'temiryol' },
-  { id: 'magistral',name: 'Avtomagistral va turar joy',icon: 'magistral' },
-  { id: 'yoritish', name: 'Yoritish va signallar',     icon: 'yoritish' },
-  { id: 'shatak',   name: 'Shatakka olish',            icon: 'shatak' },
-  { id: 'yuk',      name: 'Yuk tashish',               icon: 'yuk' },
-  { id: 'texnik',   name: 'Texnik holat va nosozlik',  icon: 'texnik' },
-  { id: 'haydash',  name: 'Haydash texnikasi va YTH',  icon: 'haydash' },
-  { id: 'tibbiy',   name: 'Tibbiy yordam',             icon: 'tibbiy' },
-  { id: 'atama',    name: 'Atamalar va ta’riflar',     icon: 'atama' },
-  { id: 'umumiy',   name: 'Boshqa qoidalar',           icon: 'umumiy' }
+  /* icon — js/icons.js dagi chizma nomi (emoji emas)
+     name — uch tilda: l = lotin, c = kirill, r = rus */
+  { id: 'belgi',    icon: 'belgi',    name: { l: 'Yo‘l belgilari', c: 'Йўл белгилари', r: 'Дорожные знаки' } },
+  { id: 'chiziq',   icon: 'chiziq',   name: { l: 'Yo‘l chiziqlari', c: 'Йўл чизиқлари', r: 'Дорожная разметка' } },
+  { id: 'svetofor', icon: 'svetofor', name: { l: 'Svetofor va regulirovchi', c: 'Светофор ва регулировчи', r: 'Светофор и регулировщик' } },
+  { id: 'chorraha', icon: 'chorraha', name: { l: 'Chorrahalardan o‘tish', c: 'Чорраҳалардан ўтиш', r: 'Проезд перекрёстков' } },
+  { id: 'ustunlik', icon: 'ustunlik', name: { l: 'Ustunlik va yo‘l berish', c: 'Устунлик ва йўл бериш', r: 'Приоритет и уступить дорогу' } },
+  { id: 'manevr',   icon: 'manevr',   name: { l: 'Manevr va burilish', c: 'Маневр ва бурилиш', r: 'Манёвр и поворот' } },
+  { id: 'quvib',    icon: 'quvib',    name: { l: 'Quvib o‘tish', c: 'Қувиб ўтиш', r: 'Обгон' } },
+  { id: 'tezlik',   icon: 'tezlik',   name: { l: 'Tezlik va masofa', c: 'Тезлик ва масофа', r: 'Скорость и дистанция' } },
+  { id: 'toxtash',  icon: 'toxtash',  name: { l: 'To‘xtash va turish', c: 'Тўхташ ва туриш', r: 'Остановка и стоянка' } },
+  { id: 'piyoda',   icon: 'piyoda',   name: { l: 'Piyoda va yo‘lovchilar', c: 'Пиёда ва йўловчилар', r: 'Пешеходы и пассажиры' } },
+  { id: 'temiryol', icon: 'temiryol', name: { l: 'Temir yo‘l kesishmalari', c: 'Темир йўл кесишмалари', r: 'Железнодорожные переезды' } },
+  { id: 'magistral',icon: 'magistral',name: { l: 'Avtomagistral va turar joy', c: 'Автомагистрал ва турар жой', r: 'Автомагистраль и жилая зона' } },
+  { id: 'yoritish', icon: 'yoritish', name: { l: 'Yoritish va signallar', c: 'Ёритиш ва сигналлар', r: 'Световые приборы и сигналы' } },
+  { id: 'shatak',   icon: 'shatak',   name: { l: 'Shatakka olish', c: 'Шатаккa олиш', r: 'Буксировка' } },
+  { id: 'yuk',      icon: 'yuk',      name: { l: 'Yuk tashish', c: 'Юк ташиш', r: 'Перевозка грузов' } },
+  { id: 'texnik',   icon: 'texnik',   name: { l: 'Texnik holat va nosozlik', c: 'Техник ҳолат ва носозлик', r: 'Техническое состояние и неисправности' } },
+  { id: 'haydash',  icon: 'haydash',  name: { l: 'Haydash texnikasi va YTH', c: 'Ҳайдаш техникаси ва ЙТҲ', r: 'Техника вождения и ДТП' } },
+  { id: 'tibbiy',   icon: 'tibbiy',   name: { l: 'Tibbiy yordam', c: 'Тиббий ёрдам', r: 'Первая помощь' } },
+  { id: 'atama',    icon: 'atama',    name: { l: 'Atamalar va ta’riflar', c: 'Атамалар ва таърифлар', r: 'Термины и определения' } },
+  { id: 'umumiy',   icon: 'umumiy',   name: { l: 'Boshqa qoidalar', c: 'Бошқа қоидалар', r: 'Прочие правила' } }
 ];
 
 /* apostroflarni bir xillashtirish */
@@ -119,5 +120,5 @@ console.log('Jami savol:', all.length);
 console.log('Fayl:', dest, '(' + fs.statSync(dest).size + ' bayt)\n');
 TOPICS.forEach(t => {
   const n = count[t.id], bar = '#'.repeat(Math.round(n / 8));
-  console.log(String(n).padStart(4) + '  ' + t.name.padEnd(30) + bar);
+  console.log(String(n).padStart(4) + "  " + t.name.l.padEnd(30) + bar);
 });

@@ -64,6 +64,13 @@ function mm(sec) {
   return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
 }
 function L(obj) { return (obj && obj[S.lang]) || (obj && obj.l) || ''; }
+/* interfeys matni — js/i18n.js dan */
+function T(key, p) { return window.I18N ? I18N.t(key, p) : key; }
+/* mavzu nomi joriy tilda */
+function topicName(id) {
+  for (var i = 0; i < TOPICS.length; i++) if (TOPICS[i].id === id) return L(TOPICS[i].name);
+  return '';
+}
 var el = function (id) { return document.getElementById(id); };
 var view = function () { return el('view'); };
 
@@ -79,8 +86,8 @@ function ask(opts) {
       '<h3>' + esc(opts.title) + '</h3>' +
       (opts.text ? '<p>' + opts.text + '</p>' : '') +
       '<div class="modal-acts">' +
-        '<button class="btn ghost" onclick="App.askNo()">Yo‘q</button>' +
-        '<button class="btn" id="askYesBtn" onclick="App.askYes()">' + esc(opts.yes || 'Ha') + '</button>' +
+        '<button class="btn ghost" onclick="App.askNo()">' + esc(T('no')) + '</button>' +
+        '<button class="btn" id="askYesBtn" onclick="App.askYes()">' + esc(opts.yes || T('yesStart')) + '</button>' +
       '</div>' +
     '</div>';
   box.classList.add('on');
@@ -103,14 +110,14 @@ function start(mode, opts) {
   // imtihon rejimlari taymer bilan ishlaydi va statistikaga yoziladi —
   // shuning uchun boshlashdan oldin tasdiq so'raymiz
   if ((mode === 'exam' || mode === 'mixed') && !opts.ok) {
-    var tk = opts.ticket ? opts.ticket + '-bilet' : 'butun bazadan tasodifiy savollar';
+    var tk = opts.ticket ? T('titleTicket', { t: opts.ticket }) : T('confirmRandom');
     return ask({
       icon: 'exam',
-      title: 'Haqiqatdan boshlamoqchimisiz?',
-      text: '<b>' + esc(tk) + '</b><br>' + EXAM_COUNT + ' savol · ' + (EXAM_SECONDS / 60) +
-            ' daqiqa · ' + MAX_ERRORS + ' tagacha xatoga ruxsat<br>' +
-            '<span class="warn-txt">Taymer darhol ishga tushadi, javobni o‘zgartirib bo‘lmaydi.</span>',
-      yes: 'Ha, boshlash',
+      title: T('confirmTitle'),
+      text: '<b>' + esc(tk) + '</b><br>' +
+            esc(T('confirmLine', { n: EXAM_COUNT, m: EXAM_SECONDS / 60, e: MAX_ERRORS })) + '<br>' +
+            '<span class="warn-txt">' + esc(T('confirmWarn')) + '</span>',
+      yes: T('yesStart'),
       onYes: function () { start(mode, { ticket: opts.ticket, ok: true }); }
     });
   }
@@ -226,25 +233,19 @@ function renderExam() {
 
   var lives = '';
   if (ses.timed) {
-    lives = '<div class="lives" title="Ruxsat etilgan xatolar">';
+    lives = '<div class="lives" title="' + esc(T('livesTitle')) + '">';
     for (var i = 0; i <= MAX_ERRORS; i++) {
       lives += '<span class="life' + (i < errs ? ' lost' : '') + '"></span>';
     }
     lives += '</div>';
   }
 
-  var topicName = '';
-  if (ses.mode === 'topic') {
-    for (var ti = 0; ti < TOPICS.length; ti++) {
-      if (TOPICS[ti].id === ses.topic) { topicName = TOPICS[ti].name; break; }
-    }
-  }
-  var title = ses.mode === 'exam' ? ses.ticket + '-bilet · imtihon'
-            : ses.mode === 'mixed' ? 'Aralash imtihon'
-            : ses.mode === 'ticket' ? ses.ticket + '-bilet'
-            : ses.mode === 'marathon' ? 'Marafon'
-            : ses.mode === 'topic' ? topicName
-            : 'Xatolar ustida ishlash';
+  var title = ses.mode === 'exam' ? T('titleExam', { t: ses.ticket })
+            : ses.mode === 'mixed' ? T('modeMixed')
+            : ses.mode === 'ticket' ? T('titleTicket', { t: ses.ticket })
+            : ses.mode === 'marathon' ? T('modeMarathon')
+            : ses.mode === 'topic' ? topicName(ses.topic)
+            : T('titleMistakes');
 
   var bar =
     '<div class="bar">' +
@@ -252,7 +253,7 @@ function renderExam() {
       '<div class="counter"><b>' + (ses.idx + 1) + '</b> / ' + ses.list.length + '</div>' +
       lives +
       '<div class="spacer"></div>' +
-      '<button class="chip" onclick="App.quit()">Chiqish</button>' +
+      '<button class="chip" onclick="App.quit()">' + esc(T('quit')) + '</button>' +
     '</div>';
 
   // navigator (marafonda 1260 ta tugma chizmaymiz)
@@ -283,16 +284,16 @@ function renderExam() {
 
   var izoh = '';
   if (reveal && L(q.ex)) {
-    izoh = '<div class="izoh"><b>Izoh</b>' + esc(L(q.ex)) + '</div>';
+    izoh = '<div class="izoh"><b>' + esc(T('izoh')) + '</b>' + esc(L(q.ex)) + '</div>';
   }
 
   var last = ses.idx === ses.list.length - 1;
   var acts =
     '<div class="acts">' +
       '<button class="btn ghost" onclick="App.go(' + (ses.idx - 1) + ')"' + (ses.idx === 0 ? ' disabled' : '') + '>' +
-        Ico.svg('prev', 18) + 'Oldingi</button>' +
+        Ico.svg('prev', 18) + esc(T('prev')) + '</button>' +
       '<button class="btn" onclick="App.next()">' +
-        (last ? Ico.svg('done', 18) + 'Yakunlash' : 'Keyingi' + Ico.svg('next', 18)) +
+        (last ? Ico.svg('done', 18) + esc(T('finishBtn')) : esc(T('next')) + Ico.svg('next', 18)) +
       '</button>' +
     '</div>';
 
@@ -300,7 +301,7 @@ function renderExam() {
   var hasRight = !!q.img || !!izoh;
   var right = hasRight
     ? '<div class="qcol-r">' +
-        (q.img ? '<div class="qimg"><img src="images/' + esc(q.img) + '" alt="savol rasmi"></div>' : '') +
+        (q.img ? '<div class="qimg"><img src="images/' + esc(q.img) + '" alt="' + esc(T('imgAlt')) + '"></div>' : '') +
         izoh +
       '</div>'
     : '';
@@ -311,7 +312,7 @@ function renderExam() {
     '<div class="card">' +
       '<div class="qgrid' + (hasRight ? '' : ' solo') + '">' +
         '<div class="qcol-l">' +
-          '<div class="qmeta">' + esc(title) + ' · savol ' + (ses.idx + 1) + '</div>' +
+          '<div class="qmeta">' + esc(title) + ' · ' + esc(T('qword')) + ' ' + (ses.idx + 1) + '</div>' +
           '<div class="qtext">' + esc(L(q.q)) + '</div>' +
           '<div class="opts">' + opts + '</div>' +
         '</div>' +
@@ -319,9 +320,9 @@ function renderExam() {
       '</div>' +
       acts +
     '</div>' +
-    '<div class="hint"><span class="kbd">1</span>–<span class="kbd">4</span> javob · ' +
-      '<span class="kbd">&larr;</span><span class="kbd">&rarr;</span> harakat · ' +
-      '<span class="kbd">Enter</span> keyingi</div>';
+    '<div class="hint"><span class="kbd">1</span>–<span class="kbd">4</span> ' + esc(T('hintAnswer')) + ' · ' +
+      '<span class="kbd">&larr;</span><span class="kbd">&rarr;</span> ' + esc(T('hintMove')) + ' · ' +
+      '<span class="kbd">Enter</span> ' + esc(T('hintNext')) + '</div>';
 }
 
 /* ---------------- natija ---------------- */
@@ -349,9 +350,9 @@ function finish(reason) {
     if (!p || ok > p) { S.tickets[ses.ticket] = ok; save(); }
   }
 
-  var why = reason === 'vaqt'  ? 'Vaqt tugadi'
-          : reason === 'xato'  ? 'Ruxsat etilgan xatolar chegarasi oshib ketdi'
-          : pass ? 'Imtihondan muvaffaqiyatli o‘tdingiz' : 'Imtihondan o‘ta olmadingiz';
+  var why = reason === 'vaqt'  ? T('whyTime')
+          : reason === 'xato'  ? T('whyErr')
+          : pass ? T('whyPass') : T('whyFail');
 
   var C = 2 * Math.PI * 56;
   var ring =
@@ -364,15 +365,15 @@ function finish(reason) {
   var review = ses.list.map(function (q, i) {
     var a = ses.ans[i], good = a >= 0 && q.a[a].ok;
     var right = q.a.filter(function (o) { return o.ok; })[0];
-    var lines = '<div class="ln g"><span class="tag">TO‘G‘RI</span><span>' + esc(L(right)) + '</span></div>';
-    if (a >= 0 && !good) lines += '<div class="ln r"><span class="tag">SIZ</span><span>' + esc(L(q.a[a])) + '</span></div>';
-    if (a < 0) lines += '<div class="ln r"><span class="tag">SIZ</span><span>javob berilmadi</span></div>';
+    var lines = '<div class="ln g"><span class="tag">' + esc(T('tagRight')) + '</span><span>' + esc(L(right)) + '</span></div>';
+    if (a >= 0 && !good) lines += '<div class="ln r"><span class="tag">' + esc(T('tagYou')) + '</span><span>' + esc(L(q.a[a])) + '</span></div>';
+    if (a < 0) lines += '<div class="ln r"><span class="tag">' + esc(T('tagYou')) + '</span><span>' + esc(T('noAnswer')) + '</span></div>';
     return '<div class="rv' + (good ? ' ok' : '') + '">' +
-        '<div class="n">' + (i + 1) + '-SAVOL · ' + q.t + '-BILET</div>' +
+        '<div class="n">' + esc(T('rvMeta', { i: i + 1, t: q.t })) + '</div>' +
         '<div class="q">' + esc(L(q.q)) + '</div>' +
         (q.img ? '<img src="images/' + esc(q.img) + '" loading="lazy" alt="">' : '') +
         lines +
-        (L(q.ex) ? '<div class="izoh"><b>Izoh</b>' + esc(L(q.ex)) + '</div>' : '') +
+        (L(q.ex) ? '<div class="izoh"><b>' + esc(T('izoh')) + '</b>' + esc(L(q.ex)) + '</div>' : '') +
       '</div>';
   }).join('');
 
@@ -384,20 +385,20 @@ function finish(reason) {
   view().innerHTML =
     '<div class="card res ' + (pass ? 'pass' : 'fail') + '">' +
       ring +
-      '<div class="verdict">' + (pass ? 'O‘TDINGIZ' : 'YIQILDINGIZ') + '</div>' +
+      '<div class="verdict">' + esc(pass ? T('passed') : T('failed')) + '</div>' +
       '<div class="sub">' + esc(why) + '</div>' +
       '<div class="rstats">' +
-        '<div class="stat"><b>' + ok + '</b><small>to‘g‘ri</small></div>' +
-        '<div class="stat"><b>' + errs + '</b><small>xato</small></div>' +
-        '<div class="stat"><b>' + (total - answered) + '</b><small>javobsiz</small></div>' +
-        (ses.timed ? '<div class="stat"><b>' + mm(EXAM_SECONDS - ses.left) + '</b><small>vaqt</small></div>' : '') +
+        '<div class="stat"><b>' + ok + '</b><small>' + esc(T('rCorrect')) + '</small></div>' +
+        '<div class="stat"><b>' + errs + '</b><small>' + esc(T('rWrong')) + '</small></div>' +
+        '<div class="stat"><b>' + (total - answered) + '</b><small>' + esc(T('rBlank')) + '</small></div>' +
+        (ses.timed ? '<div class="stat"><b>' + mm(EXAM_SECONDS - ses.left) + '</b><small>' + esc(T('rTime')) + '</small></div>' : '') +
       '</div>' +
       '<div class="acts" style="justify-content:center">' +
-        '<button class="btn" onclick="' + again + '">Qayta topshirish</button>' +
-        '<button class="btn ghost" onclick="App.home()">Bosh sahifa</button>' +
+        '<button class="btn" onclick="' + again + '">' + esc(T('retry')) + '</button>' +
+        '<button class="btn ghost" onclick="App.home()">' + esc(T('homeBtn')) + '</button>' +
       '</div>' +
     '</div>' +
-    '<div class="sec-title">Savollar tahlili</div>' +
+    '<div class="sec-title">' + esc(T('analysis')) + '</div>' +
     '<div class="review">' + review + '</div>';
 
   ses = null;
@@ -408,9 +409,9 @@ function quit() {
   if (ses && ses.timed) {
     return ask({
       icon: 'warn',
-      title: 'Imtihonni tark etasizmi?',
-      text: '<span class="warn-txt">Natija saqlanmaydi, imtihon boshidan boshlanadi.</span>',
-      yes: 'Ha, chiqish',
+      title: T('quitTitle'),
+      text: '<span class="warn-txt">' + esc(T('quitWarn')) + '</span>',
+      yes: T('yesQuit'),
       onYes: function () {
         if (ses && ses.timer) clearInterval(ses.timer);
         ses = null;
@@ -437,53 +438,49 @@ function home() {
     var best = S.tickets[i];
     var col = best == null ? '' : (best >= 18 ? 'var(--ok)' : best >= 10 ? 'var(--accent)' : 'var(--bad)');
     tk += '<button class="tk" onclick="App.start(\'ticket\',{ticket:' + i + '})" title="' +
-          (best == null ? 'topshirilmagan' : 'eng yaxshi: ' + best + '/20') + '">' + i +
+          esc(best == null ? T('tkNone') : T('tkBest', { n: best })) + '">' + i +
           (col ? '<span class="dot" style="background:' + col + '"></span>' : '') + '</button>';
   }
 
   view().innerHTML =
     '<section class="hero">' +
-      '<h1>Haqiqiy imtihon<br><span>muhitida mashq qiling</span></h1>' +
-      '<p>' + Q.length + ' ta rasmiy savol · 63 bilet · uch tilda. ' +
-        EXAM_COUNT + ' savol, ' + (EXAM_SECONDS / 60) + ' daqiqa, ' + MAX_ERRORS + ' tagacha xatoga ruxsat.</p>' +
+      '<h1>' + esc(T('hero1')) + '<br><span>' + esc(T('hero2')) + '</span></h1>' +
+      '<p>' + esc(T('heroP', { q: Q.length, n: EXAM_COUNT, m: EXAM_SECONDS / 60, e: MAX_ERRORS })) + '</p>' +
       '<div class="stats">' +
-        '<div class="stat"><b>' + S.exams + '</b><small>imtihon</small></div>' +
-        '<div class="stat"><b>' + rate + '%</b><small>o‘tish</small></div>' +
-        '<div class="stat"><b>' + mist + '</b><small>xato</small></div>' +
+        '<div class="stat"><b>' + S.exams + '</b><small>' + esc(T('statExams')) + '</small></div>' +
+        '<div class="stat"><b>' + rate + '%</b><small>' + esc(T('statPass')) + '</small></div>' +
+        '<div class="stat"><b>' + mist + '</b><small>' + esc(T('statErr')) + '</small></div>' +
       '</div>' +
     '</section>' +
 
     '<div class="modes">' +
       '<button class="mode hero-mode" onclick="App.randomExam()">' +
-        '<span class="badge">ASOSIY</span>' +
-        '<div class="ic">' + Ico.svg('exam', 28) + '</div><h3>Imtihon</h3>' +
-        '<p>Tasodifiy bilet, ' + (EXAM_SECONDS / 60) + ' daqiqa taymer, javob qulflanadi. ' +
-          (MAX_ERRORS + 1) + '-xatoda imtihon to‘xtaydi.</p></button>' +
+        '<span class="badge">' + esc(T('badgeMain')) + '</span>' +
+        '<div class="ic">' + Ico.svg('exam', 28) + '</div><h3>' + esc(T('modeExam')) + '</h3>' +
+        '<p>' + esc(T('modeExamP', { m: EXAM_SECONDS / 60, k: MAX_ERRORS + 1 })) + '</p></button>' +
 
       '<button class="mode" onclick="App.start(\'mixed\')">' +
-        '<div class="ic">' + Ico.svg('mixed', 28) + '</div><h3>Aralash imtihon</h3>' +
-        '<p>Butun bazadan ' + EXAM_COUNT + ' ta tasodifiy savol. Eng qiyin rejim.</p></button>' +
+        '<div class="ic">' + Ico.svg('mixed', 28) + '</div><h3>' + esc(T('modeMixed')) + '</h3>' +
+        '<p>' + esc(T('modeMixedP', { n: EXAM_COUNT })) + '</p></button>' +
 
       '<button class="mode" onclick="App.start(\'marathon\')">' +
-        '<div class="ic">' + Ico.svg('marathon', 28) + '</div><h3>Marafon</h3>' +
-        '<p>Barcha ' + Q.length + ' savol ketma-ket. Izoh bilan, joyi eslab qolinadi' +
-          (S.marathon ? ' — hozir ' + (S.marathon + 1) + '-savolda' : '') + '.</p></button>' +
+        '<div class="ic">' + Ico.svg('marathon', 28) + '</div><h3>' + esc(T('modeMarathon')) + '</h3>' +
+        '<p>' + esc(T('modeMarathonP', { q: Q.length }) +
+          (S.marathon ? T('marathonAt', { n: S.marathon + 1 }) : '') + '.') + '</p></button>' +
 
       '<button class="mode" onclick="App.start(\'mistakes\')">' +
-        '<div class="ic">' + Ico.svg('mistakes', 28) + '</div><h3>Xatolarim</h3>' +
-        '<p>' + (mist ? mist + ' ta savolda xato qildingiz. To‘g‘ri javob bersangiz ro‘yxatdan chiqadi.'
-                     : 'Hozircha xato yo‘q. Imtihon topshiring.') + '</p></button>' +
+        '<div class="ic">' + Ico.svg('mistakes', 28) + '</div><h3>' + esc(T('modeMistakes')) + '</h3>' +
+        '<p>' + esc(mist ? T('modeMistakesP', { n: mist }) : T('modeMistakesNo')) + '</p></button>' +
     '</div>' +
 
     (window.PWA ? PWA.card() : '') +
 
-    '<div class="sec-title">Mavzular</div>' +
-    '<div class="sec-sub">Zaif mavzuni tanlab, faqat shu turdagi savollarni mashq qiling. ' +
-      'Halqa — mavzuni qanchalik o‘zlashtirganingiz.</div>' +
+    '<div class="sec-title">' + esc(T('secTopics')) + '</div>' +
+    '<div class="sec-sub">' + esc(T('secTopicsSub')) + '</div>' +
     '<div class="topics">' + topicCards() + '</div>' +
 
-    '<div class="sec-title">Biletlar</div>' +
-    '<div class="sec-sub">O‘rgatuvchi rejim — javobdan keyin darhol izoh ko‘rsatiladi, taymer yo‘q.</div>' +
+    '<div class="sec-title">' + esc(T('secTickets')) + '</div>' +
+    '<div class="sec-sub">' + esc(T('secTicketsSub')) + '</div>' +
     '<div class="tickets">' + tk + '</div>';
 
   window.scrollTo(0, 0);
@@ -496,15 +493,16 @@ function topicCards() {
     if (!p.total) return '';
     var C = 2 * Math.PI * 15;
     var col = p.pct >= 80 ? 'var(--ok)' : p.pct >= 40 ? 'var(--accent)' : 'var(--line)';
+    var nm = L(t.name);
     return '<button class="tp" onclick="App.start(\'topic\',{topic:\'' + t.id + '\'})" ' +
-             'title="' + esc(t.name) + ' — ' + p.done + '/' + p.total + ' o‘zlashtirilgan">' +
+             'title="' + esc(T('tpTitle', { name: nm, a: p.done, b: p.total })) + '">' +
         '<div class="tp-ring">' +
           '<svg width="38" height="38"><circle cx="19" cy="19" r="15" fill="none" stroke="var(--line)" stroke-width="3.5"></circle>' +
           '<circle cx="19" cy="19" r="15" fill="none" stroke="' + col + '" stroke-width="3.5" stroke-linecap="round" ' +
             'stroke-dasharray="' + C + '" stroke-dashoffset="' + (C - C * p.pct / 100) + '" transform="rotate(-90 19 19)"></circle></svg>' +
           '<span class="tp-ic">' + Ico.svg(t.icon, 17) + '</span>' +
         '</div>' +
-        '<div class="tp-txt"><b>' + esc(t.name) + '</b><small>' + p.done + ' / ' + p.total + '</small></div>' +
+        '<div class="tp-txt"><b>' + esc(nm) + '</b><small>' + p.done + ' / ' + p.total + '</small></div>' +
       '</button>';
   }).join('');
 }
@@ -516,15 +514,18 @@ function randomExam() {
 /* ---------------- til / mavzu ---------------- */
 function setLang(l) {
   S.lang = l; save();
+  if (window.I18N) I18N.set(l);                 // interfeys matnlari ham shu tilga o'tadi
+  document.documentElement.lang = l === 'r' ? 'ru' : 'uz';
   [].forEach.call(document.querySelectorAll('#langSeg button'), function (b) {
     b.classList.toggle('on', b.dataset.lang === l);
   });
+  setTheme(S.theme || 'dark');                  // mavzu tugmasi yozuvi ham yangilanadi
   ses ? renderExam() : home();
 }
 function setTheme(t) {
   S.theme = t; save();
   document.documentElement.dataset.theme = t;
-  el('themeBtn').textContent = t === 'dark' ? 'Yorug‘' : 'Qorong‘i';
+  el('themeBtn').textContent = t === 'dark' ? T('themeLight') : T('themeDark');
 }
 
 /* ---------------- klaviatura ---------------- */
@@ -556,9 +557,10 @@ window.App = {
 document.addEventListener('DOMContentLoaded', function () {
   if (!Q.length) {
     view().innerHTML = '<div class="empty"><div class="ic">' + Ico.svg('warn', 44) + '</div>' +
-      '<b>Savollar bazasi yuklanmadi.</b><br>data/questions.js fayli joyidami?</div>';
+      '<b>' + esc(T('noData')) + '</b><br>' + esc(T('noDataP')) + '</div>';
     return;
   }
+  if (window.I18N) I18N.set(S.lang || 'l');
   setTheme(S.theme || 'dark');
   setLang(S.lang || 'l');
   if (window.PWA) PWA.register();

@@ -71,7 +71,9 @@ img{max-width:100%;display:block}
 .tp-ring{position:relative;flex:0 0 38px;height:38px}
 .tp-ic{position:absolute;inset:0;display:grid;place-items:center;font-size:15px}
 .tp-txt{min-width:0}
-.tp-txt b{display:block;font-size:13.5px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* nom ikki qatorgacha o'ralsin — rus nomlari uzunroq, kesilib qolmasin */
+.tp-txt b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  font-size:13.5px;font-weight:600;line-height:1.25}
 .tp-txt small{color:var(--muted);font-size:11.5px;font-weight:600}
 
 .sec-title{margin:34px 0 4px;font-size:15px;font-weight:700;display:flex;align-items:center;gap:9px}
