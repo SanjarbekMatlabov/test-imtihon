@@ -1,19 +1,11 @@
-/* Savollarni mavzular bo'yicha tasniflash.
-   Ishlatish:  node tools/classify.js
-   Natija:     data/topics.js  (window.TOPICS + savol -> mavzu xaritasi)
 
-   Mantiq: avval izohdagi YHQ ilova havolasi (eng ishonchli signal),
-   so'ng savol matnidagi atamalar ustuvorlik tartibida tekshiriladi. */
 
 const fs = require('fs');
 const path = require('path');
 const SRC = 'D:/data xauusdt/prava-test-2026/barcha-uz-lat.json';
 const all = JSON.parse(fs.readFileSync(SRC, 'utf8'));
 
-/* --- mavzular: id, nom, ikonka --- */
 const TOPICS = [
-  /* icon — js/icons.js dagi chizma nomi (emoji emas)
-     name — uch tilda: l = lotin, c = kirill, r = rus */
   { id: 'belgi',    icon: 'belgi',    name: { l: 'Yo‘l belgilari', c: 'Йўл белгилари', r: 'Дорожные знаки' } },
   { id: 'chiziq',   icon: 'chiziq',   name: { l: 'Yo‘l chiziqlari', c: 'Йўл чизиқлари', r: 'Дорожная разметка' } },
   { id: 'svetofor', icon: 'svetofor', name: { l: 'Svetofor va regulirovchi', c: 'Светофор ва регулировчи', r: 'Светофор и регулировщик' } },
