@@ -1,16 +1,8 @@
-/* Service worker — ilovani internetsiz ishlatish uchun.
-   Ikkita kesh: SHELL (ilova + savollar bazasi) va IMG (savol rasmlari).
-   Rasmlar 63 MB bo'lgani uchun avtomatik yuklanmaydi — foydalanuvchi o'zi
-   "oflayn uchun yuklab olish" tugmasini bosganda yoki ko'rgan sari keshlanadi. */
 
-/* Ilova yangilanganda VERSION ni oshiring — qobiq qayta yuklanadi.
-   IMG ataylab versiyasiz: rasmlar yangilanishdan keyin ham saqlanib qoladi,
-   aks holda har safar 63 MB qaytadan yuklanardi. */
 const VERSION = 'v2';
 const SHELL = 'yhq-shell-' + VERSION;
 const IMG = 'yhq-img';
 
-/* Ilova ishlashi uchun zarur fayllar (~3.5 MB) */
 const SHELL_FILES = [
   './',
   './index.html',
@@ -38,7 +30,7 @@ self.addEventListener('install', e => {
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(
+      .then(keys => Promise.all( 
         keys.filter(k => k !== SHELL && k !== IMG).map(k => caches.delete(k))
       ))
       .then(() => self.clients.claim())
@@ -54,7 +46,6 @@ self.addEventListener('fetch', e => {
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
 
-  // sahifaga o'tish — oflaynda ham index.html ochilsin
   if (req.mode === 'navigate') {
     e.respondWith(
       fetch(req).catch(() => caches.match('./index.html', { ignoreSearch: true }))
@@ -62,7 +53,6 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // rasmlar: avval keshdan, bo'lmasa tarmoqdan olib keshga qo'shamiz
   if (isImage(url)) {
     e.respondWith(
       caches.match(req).then(hit => hit || fetch(req).then(res => {

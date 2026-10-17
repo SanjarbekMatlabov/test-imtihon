@@ -1,4 +1,3 @@
-/* Oddiy mahalliy server — "node server.js" deb ishga tushiring */
 const http = require('http'), fs = require('fs'), path = require('path');
 const PORT = process.env.PORT || 5173;
 const TYPES = {
